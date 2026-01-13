@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ course.title }}</h1>
+
+{% if course.logo %}
+    <img src="{{ course.logo.url }}" width="200">
+{% endif %}
+
+<p>{{ course.description }}</p>
+<p>
+    Даты: {{ course.start_date }} – {{ course.end_date }}
+</p>
+
+<p>
+    Средний рейтинг:
+    {{ avg_rating|default:"Нет оценок" }}
+</p>
+
+{% if user == course.creator %}
+    <a class="btn" href="{% url 'course_update' course.id %}">Редактировать</a>
+    <a class="btn btn-danger" href="{% url 'course_delete' course.id %}">Удалить</a>
+{% endif %}
+
+<hr>
+
+<h2>Уроки</h2>
+
+{% if user.is_authenticated %}
+    <a class="btn" href="{% url 'lesson_create' course.id %}">➕ Добавить урок</a>
+{% endif %}
+
+<ul>
+{% for lesson in lessons %}
+    <li>
+        <strong>{{ lesson.title }}</strong><br>
+        {{ lesson.description }}<br>
+        {{ lesson.text }}<br>
+
+        {% if user == course.creator %}
+            <a href="{% url 'lesson_update' lesson.id %}">Редактировать</a>
+            <a href="{% url 'lesson_delete' lesson.id %}">Удалить</a>
+        {% endif %}
+    </li>
+{% empty %}
+    <li>Уроков нет</li>
+{% endfor %}
+</ul>
+
+<hr>
+
+<h2>Отзывы</h2>
+
+{% if user.is_authenticated %}
+    <a class="btn" href="{% url 'review_create' course.id %}">
+        Оставить отзыв
+    </a>
+{% endif %}
+
+<ul>
+{% for review in reviews %}
+    <li>
+        <strong>{{ review.user.username }}</strong>
+        — {{ review.rating }}<br>
+        {{ review.comment }}
+    </li>
+{% empty %}
+    <li>Отзывов пока нет</li>
+{% endfor %}
+</ul>
+{% endblock %}
